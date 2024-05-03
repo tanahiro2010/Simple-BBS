@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple BBS</title>
+    <link rel="stylesheet" href="/css?q=Style">
+    <link rel="stylesheet" href="/css/Style.css">
+</head>
+
+<body>
+    <header>
+        <h1 class="title">Simple BBS</h1>
+        <p>このサイトは、サンプルです</p>
+    </header>
+    <fieldset class="pages">
+    </fieldset>
+
+    <button id="create_sled">Create sled</button>
+
+    <div class="sled_info" style="display: none;">
+        <label for="name">Sled Name: </label>
+        <input type="text" name="name" id="sled_name"><br>
+        <button class="create">create</button>
+    </div>
+
+    <script>
+        const setup = (() =>{
+            console.log('Start connect...');
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", "/api/sleds");
+            xhr.send();
+            xhr.onloadend = (() =>{
+                const sleds_box = document.querySelectorAll('.pages')[0];
+                const sleds_data = JSON.parse(xhr.responseText);
+                console.log(`Sleds: ${JSON.stringify(sleds_data)}`);
+                let html = '';
+                for (let sled of sleds_data){
+                    html += `
+                        <div>
+                            <h2 title="click here" onclick="window.location = '/Sleds?name=${sled}'">${sled}</h2>
+                        </div>
+                    `;
+                }
+                console.log(html);
+                sleds_box.innerHTML = html;
+            });
+        });
+        setup();
+        const create = document.querySelector("#create_sled");
+        const sled_box = document.querySelector("pages");
+        const create_sled_box = document.querySelectorAll(".sled_info")[0];
+        const Enter_create = document.querySelector(".create");
+
+        create.addEventListener('click', () => {
+            console.log("Display info");
+            create_sled_box.style = "display: 1";
+        });
+
+        Enter_create.addEventListener('click', () =>{
+            const formData = new FormData();
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/api/create-Sled");
+            const sled_title = document.querySelector("#sled_name").value;
+            console.log(`Sled_Name: ${sled_title}`);
+            formData.append("name", sled_title);
+            xhr.send(formData);
+            xhr.onloadend = (() =>{
+                const response = xhr.responseText;
+                console.log("Done connected.");
+                if (response == "False"){
+                    alert("The name sled created.");
+                }else{
+                    location.reload();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

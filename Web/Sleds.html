@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple BBS</title>
+    <link rel="stylesheet" href="/css/Style.css">
+    <link rel="stylesheet" href="/css/?q=Style">
+    <link rel="stylesheet" href="/css/BBS.css">
+    <link rel="stylesheet" href="/css/?q=BBS">
+
+    <style>
+        .title {
+            text-align: center;
+        }
+
+        .comments {
+            height: 500px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .controler {
+            text-align: center;
+        }
+
+        button {
+            align-items: center;
+            margin: auto;
+        }
+
+        .p {
+            font-size: larger;
+        }
+
+        .title {
+            text-align: center;
+        }
+
+        p {
+            font-size: large;
+            font-style: oblique;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="title" onclick="window.location = '/'">Simple BBS</h1>
+    <fieldset class="comments"></fieldset>
+    <div class="controler">
+        <h2>コメント</h2>
+        <textarea name="" id="comment" cols="50" rows="5"></textarea>
+        <button class="send">Send</button>
+    </div>
+    <script>
+        const setup = ((sleds_id) => {
+            const xhr = new XMLHttpRequest();
+            const formData = new FormData();
+
+            const comments_box = document.querySelectorAll(".comments")[0];
+            formData.append("name", sleds_id);
+            console.log(`Sleds_name: ${sleds_id}`);
+
+            xhr.open("POST", '/api/get_comments');
+            xhr.send(formData);
+
+            xhr.onloadend = (() => {
+                const response = xhr.responseText;
+                console.log(`Response: ${response}`);
+
+                if (response == "False") {
+                    alert("The name sled didn't created");
+                    window.location = "/";
+                    return;
+                }
+
+                const comments = JSON.parse(response);
+                let comments_html = "";
+                for (let comment of comments) {
+                    comments_html += `
+                        <div style="display: flex">
+                            <div class="p">風吹けば名無し: ${comment}</div>
+                        </div>
+                    `;
+                }
+
+                comments_box.innerHTML = comments_html;
+            });
+        });
+
+        const sled_name = new URL(location.href).searchParams.get("name");
+        setup(sled_name);
+
+
+        const comment = document.querySelector("#comment");
+        const send = document.querySelectorAll('.send')[0];
+
+        send.addEventListener('click', (() => {
+            const xhr = new XMLHttpRequest();
+            const formData = new FormData();
+            const comments_value = comment.value;
+            console.log(`Comment: ${comments_value}`)
+            formData.append("name", sled_name);
+            formData.append("value", comments_value);
+            xhr.open('POST', '/api/send_comments');
+            xhr.send(formData);
+
+            xhr.onloadend = (() => {
+                const response = xhr.responseText;
+                if (response == "False") {
+                    window.location = "/";
+                } else {
+                    location.reload();
+                }
+            });
+        }));
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,20 @@
+.comments {
+    height: 500px;
+}
+
+h2 {
+    text-align: center;
+}
+
+.controler {
+    text-align: center;
+}
+
+button {
+    align-items: center;
+    margin: auto;
+}
+
+.p {
+    font-size: larger;
+}
